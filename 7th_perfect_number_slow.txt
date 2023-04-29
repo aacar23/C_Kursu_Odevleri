@@ -1,0 +1,34 @@
+#include <stdio.h>
+int is_perfect_number(int number){
+    if(number==0){
+        return 0;
+    }
+    int sum=0;
+    for(int i=1;i<number;i++){
+        if(number%i==0){
+            sum+=i;
+        }
+    }
+    if(sum==number){
+        return 1;
+    }
+    return 0;
+}
+
+int return_nth_perfect_number(int n){
+    int i=0;
+    int count=0;
+    while(1) {
+        i++;
+        if(is_perfect_number(i)){
+            count++;
+            if(count==n){
+                return i;
+            }
+        }
+    }
+}
+
+int main(void){
+    printf("%d", return_nth_perfect_number(7));
+}
