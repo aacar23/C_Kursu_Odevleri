@@ -31,6 +31,7 @@ char *itoa_basic(char *dest, long num, int base)
         *dest++ = num_characters[num / (divider = (long)pow(base, --digit_cnt))];
         num %= divider;
     } while (digit_cnt);
+    *dest = '\0';
     return dest;
 }
 
