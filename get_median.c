@@ -4,8 +4,8 @@
 
 int double_cmp(const void *vp1, const void *vp2)
 {
-    double *p1 = (double *)vp1;
-    double *p2 = (double *)vp2;
+    const double *p1 = (const double *)vp1;
+    const double *p2 = (const double *)vp2;
     return *p1 > *p2 ? 1 : *p1 < *p2 ? -1 : 0;
 }
 
