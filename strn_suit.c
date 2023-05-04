@@ -15,7 +15,7 @@ char *my_strncat(char *p1, const char *p2, size_t size)
 {
     char *ret_p1 = p1;
     p1 += strlen(p1);
-    while (size--) {
+    while (size-- && *p2) {
         *p1++ = *p2++;
     }
 
