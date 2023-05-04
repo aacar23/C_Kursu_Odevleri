@@ -19,7 +19,7 @@ double get_median_ret(const double *p_sorted, size_t size)
 
 double get_median(const double *p, size_t size)
 {
-    double *p_temp = malloc(sizeof(double) * size);
+    double *p_temp = (double *)malloc(sizeof(double) * size);
     if (!p_temp)
         exit(EXIT_FAILURE);
     memcpy(p_temp, p, sizeof(double) * size);
