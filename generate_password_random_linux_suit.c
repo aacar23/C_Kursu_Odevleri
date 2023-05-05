@@ -25,8 +25,8 @@ char **fill_array_with_random_passwords_linux(const char **dest, size_t number_o
     return (char **)dest;
 }
 
-void free_all_char_pointer_array_elements(char **dest, size_t number_of_elements)
+void free_all_char_pointer_array_elements(char **arr, size_t number_of_elements)
 {
     while (number_of_elements--)
-        free(*dest++);
+        free(*arr++);
 }
