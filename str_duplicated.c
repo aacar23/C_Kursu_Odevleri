@@ -4,7 +4,7 @@
 
 char *str_duplicated(const char *str)
 {
-    char *dup = malloc(sizeof(char) * (strlen(str) + 1));
+    char *dup = (char *)malloc(sizeof(char) * (strlen(str) + 1));
     if (!dup){
         fprintf(stderr, "out of memory");
         exit(1);
