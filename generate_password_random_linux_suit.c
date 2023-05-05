@@ -4,6 +4,10 @@
 char *generate_a_password_linux(size_t length_of_password)
 {
     char *str = (char *)calloc(length_of_password + 1, sizeof(char));
+    if (!str){
+        fprintf(stderr, "out of memory");
+        exit(EXIT_FAILURE);
+    }
     FILE *f = fopen("/dev/urandom", "r");
     for (size_t i = 0;i < length_of_password;i++){
         unsigned int ascii_char;
