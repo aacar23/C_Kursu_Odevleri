@@ -1,6 +1,5 @@
 #include <string.h>
 #include <stdlib.h>
-#include <stdio.h>
 
 char *str_sum_buffer(const char *str1, const char *str2, char *buffer)
 {
@@ -24,7 +23,6 @@ char *str_sum_allocated(const char *str1, const char *str2)
 {
     char *sum_allocated = (char *)malloc(sizeof(char) * (strlen(str1) + strlen(str2) + 1));
     if (!sum_allocated){
-        fprintf(stderr, "out of memory");
         return NULL;
     }
     strcpy(sum_allocated, str1);
