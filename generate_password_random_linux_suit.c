@@ -8,7 +8,7 @@ char *generate_a_password_linux(size_t length_of_password)
     for (size_t i = 0;i < length_of_password;i++){
         unsigned int ascii_char;
         fread(&ascii_char, sizeof(unsigned int), 1, f);
-        *(str + i) = (int)(ascii_char % 94) + 32;
+        *(str + i) = (int)(ascii_char % 95) + 32;
     }
     fclose(f);
     return str;
