@@ -8,7 +8,7 @@ char *str_sum_array(const char * const *str_arr, size_t size)
     for (size_t i = 0;i < size;i++)
         len += strlen(*(str_arr + i));
 
-    char *res = malloc(sizeof(char) * len + 1);
+    char *res = (char *)malloc(sizeof(char) * (len + 1));
     if (!res)
         return NULL;
     *res = '\0';
