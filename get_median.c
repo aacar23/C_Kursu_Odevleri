@@ -20,7 +20,7 @@ double get_median(const double *p, size_t size)
 {
     double *p_temp = (double *)malloc(sizeof(double) * size);
     if (!p_temp){
-        printf("out of memory");
+        fprintf(stderr, "out of memory");
         exit(EXIT_FAILURE);
     }
     memcpy(p_temp, p, sizeof(double) * size);
