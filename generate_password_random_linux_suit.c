@@ -3,7 +3,7 @@
 
 char *generate_a_password_linux(size_t length_of_password)
 {
-    char *str = calloc(length_of_password + 1, sizeof(char));
+    char *str = (char *)calloc(length_of_password + 1, sizeof(char));
     FILE *f = fopen("/dev/urandom", "r");
     for (size_t i = 0;i < length_of_password;i++){
         unsigned int ascii_char;
