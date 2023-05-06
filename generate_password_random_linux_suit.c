@@ -3,12 +3,16 @@
 
 char *generate_a_password_linux(size_t length_of_password)
 {
-    char *str = calloc(length_of_password + 1, sizeof(char));
+    char *str = (char *)calloc(length_of_password + 1, sizeof(char));
+    if (!str){
+        fprintf(stderr, "out of memory");
+        exit(EXIT_FAILURE);
+    }
     FILE *f = fopen("/dev/urandom", "r");
     for (size_t i = 0;i < length_of_password;i++){
         unsigned int ascii_char;
         fread(&ascii_char, sizeof(unsigned int), 1, f);
-        *(str + i) = (int)(ascii_char % 94) + 32;
+        *(str + i) = (int)(ascii_char % 95) + 32;
     }
     fclose(f);
     return str;
@@ -21,8 +25,8 @@ char **fill_array_with_random_passwords_linux(const char **dest, size_t number_o
     return (char **)dest;
 }
 
-void free_all_char_pointer_array_elements(char **dest, size_t number_of_elements)
+void free_all_char_pointer_array_elements(char **arr, size_t number_of_elements)
 {
     while (number_of_elements--)
-        free(*dest++);
+        free(*arr++);
 }
