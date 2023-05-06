@@ -71,7 +71,7 @@ void print_matrix(const int * const *matrix, size_t rows, size_t columns)
 {
     while (rows--){
         for (size_t i = 0;i < columns;i++)
-            printf("%d,", *((*matrix) + i));
+            printf("%d, ", *((*matrix) + i));
         matrix++;
         putchar('\n');
     }
