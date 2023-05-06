@@ -110,9 +110,8 @@ void *mymemmove(void *vpdest, const void *vpsource, size_t bytes)
     const unsigned char *psource = (const unsigned char *)vpsource;
     unsigned char *psource_copy = (unsigned char *)malloc(bytes);
     unsigned char *pdest = (unsigned char *)vpdest;
-    memcpy(psource_copy, psource, bytes);
-    while (*pdest++ = *psource_copy++, --bytes)
-        ;
+    memcpy(pdest, memcpy(psource_copy, psource, bytes), bytes);
+    free(psource_copy);
     return vpdest;
 }
 
