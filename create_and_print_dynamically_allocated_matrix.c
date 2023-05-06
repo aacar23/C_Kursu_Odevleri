@@ -40,7 +40,7 @@ void set_array_random_standard(int *arr, int less, size_t number_of_elements)
 void fill_a_generically_array_size_typed_matrix(int **matrix, int rows, int columns, int modulus, void (*setter_func)(int *arr, int less, size_t number_of_elements))
 {
     for (int i = 0;i < rows;i++){
-        *(matrix + i) = (int *)malloc(sizeof(int) * columns);
+        *(matrix + i) = (int *)malloc(columns * sizeof(int));
         (*setter_func)(*(matrix + i), modulus, columns);
     }
 }
