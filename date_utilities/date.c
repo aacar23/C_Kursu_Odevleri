@@ -104,12 +104,22 @@ static long long reverse_num_long_long(long long num)
 }
 
 
+
+
+
+
+
 //get functions
 
 create_getter(time_t , day)
 create_getter(time_t , month)
 create_getter(time_t , year)
 create_getter(time_t , weekday)
+
+
+
+
+
 
 
 //activation functions
@@ -138,8 +148,22 @@ extern date *activate_date(date *p)
 
 //set functions
 
+
 extern date* set_date(date *p, time_t day_value, time_t month_value, time_t year_value)
 {
+
+    if (isleap(year_value) && month_value == 2 && day_value > 29)
+        return NULL;
+    else if (day_value > days_of_months[month_value - 1])
+        return NULL;
+
+    if (year_value < 1902){
+        if (year_value != 1901 && month_value != 12 && !(day_value > 12 && day_value < 32))
+            return NULL;
+    }
+    else if (year_value > 2038)
+        return NULL;
+
     struct struct_date *p_accessed= access_struct_date(p);
     p_accessed -> month = month_value;
     p_accessed -> year = year_value;
@@ -149,12 +173,6 @@ extern date* set_date(date *p, time_t day_value, time_t month_value, time_t year
 
     if (p_accessed -> month > 12)
         p_accessed -> month %= 12;
-
-
-    if (isleap(p_accessed -> year) && p_accessed -> month == 2 && p_accessed -> day > 29)
-        p_accessed -> day %= 29;
-    else if (p_accessed -> day > days_of_months[p_accessed -> month])
-        p_accessed -> day %= days_of_months[p_accessed -> month - 1];
 
 
     return p;
@@ -436,6 +454,8 @@ extern date *n_days_before_date(date *dest, const date *sources, int n)
 
 
 
+
+
 //input output functions
 
 extern void print_date(const date *p)
@@ -524,3 +544,4 @@ extern void scan_date(date *p)
         printf("mis-formatted or invalid input try again\n");
     }
 }
+
