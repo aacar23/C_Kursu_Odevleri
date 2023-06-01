@@ -71,6 +71,8 @@ static void *checked_malloc(size_t bytes)
 
 
 
+
+
 //activation functions
 
 extern date *allocate_date(void)
@@ -281,57 +283,86 @@ extern date *set_date_from_str(date *date_p, const char *str)
     return date_p;
 }
 
+static int check_date(int day_value, int month_value, int year_value, int hour_value, int minute_value, int second_value)
+{
+    if (month_value < 0 || month_value > 11)
+        return 0;
+    if (day_value < 0 || day_value > month_days[month_value] - 1)
+        return 0;
+    if (year_value < 1902 || year_value > 2037)
+        return 0;
+    if (hour_value > 59 || hour_value < 0)
+        return 0;
+    if (minute_value < 0 || minute_value > 59)
+        return 0;
+    if (second_value < 0 || second_value > 59)
+        return 0;
+    return 1;
+}
+
 extern date *set_year(date *p, int year_value)
 {
-    struct struct_date *date_p_accessed = access_date(p);
-    date_p_accessed -> year = year_value;
-    date_p_accessed -> weekday = recalculate_weekday(p);
-    date_p_accessed -> nth_day_of_the_year = calculate_nth_day_of_the_year(p);
+    struct struct_date *p_accessed = access_date(p);
+    if (!check_date(p_accessed -> day, p_accessed -> month, year_value, p_accessed -> hour, p_accessed -> minute, p_accessed -> second))
+        return NULL;
+    p_accessed -> year = year_value;
+    p_accessed -> weekday = recalculate_weekday(p);
+    p_accessed -> nth_day_of_the_year = calculate_nth_day_of_the_year(p);
     return p;
 }
 
 extern date *set_month(date *p, int month_value)
 {
-    struct struct_date *date_p_accessed = access_date(p);
-    date_p_accessed -> month = month_value;
-    date_p_accessed -> weekday = recalculate_weekday(p);
-    date_p_accessed -> nth_day_of_the_year = calculate_nth_day_of_the_year(p);
+    struct struct_date *p_accessed = access_date(p);
+    if (!check_date(p_accessed -> day, month_value - 1, p_accessed -> year, p_accessed -> hour, p_accessed -> minute, p_accessed -> second))
+        return NULL;
+    p_accessed -> month = month_value - 1;
+    p_accessed -> weekday = recalculate_weekday(p);
+    p_accessed -> nth_day_of_the_year = calculate_nth_day_of_the_year(p);
     return p;
 }
 
 extern date *set_day(date *p, int day_value)
 {
-    struct struct_date *date_p_accessed = access_date(p);
-    date_p_accessed -> day = day_value;
-    date_p_accessed -> weekday = recalculate_weekday(p);
-    date_p_accessed -> nth_day_of_the_year = calculate_nth_day_of_the_year(p);
+    struct struct_date *p_accessed = access_date(p);
+    if (!check_date(day_value - 1, p_accessed -> month, p_accessed -> year, p_accessed -> hour, p_accessed -> minute, p_accessed -> second))
+        return NULL;
+    p_accessed -> day = day_value - 1;
+    p_accessed -> weekday = recalculate_weekday(p);
+    p_accessed -> nth_day_of_the_year = calculate_nth_day_of_the_year(p);
     return p;
 }
 
 extern date *set_hour(date *p, int hour_value)
 {
-    struct struct_date *date_p_accessed = access_date(p);
-    date_p_accessed -> hour = hour_value;
-    date_p_accessed -> weekday = recalculate_weekday(p);
-    date_p_accessed -> nth_day_of_the_year = calculate_nth_day_of_the_year(p);
+    struct struct_date *p_accessed = access_date(p);
+    if (!check_date(p_accessed -> day, p_accessed -> month, p_accessed -> year, hour_value, p_accessed -> minute, p_accessed -> second))
+        return NULL;
+    p_accessed -> hour = hour_value;
+    p_accessed -> weekday = recalculate_weekday(p);
+    p_accessed -> nth_day_of_the_year = calculate_nth_day_of_the_year(p);
     return p;
 }
 
 extern date *set_minute(date *p, int minute_value)
 {
-    struct struct_date *date_p_accessed = access_date(p);
-    date_p_accessed -> minute = minute_value;
-    date_p_accessed -> weekday = recalculate_weekday(p);
-    date_p_accessed -> nth_day_of_the_year = calculate_nth_day_of_the_year(p);
+    struct struct_date *p_accessed = access_date(p);
+    if (!check_date(p_accessed -> day, p_accessed -> month, p_accessed -> year, p_accessed -> hour, minute_value, p_accessed -> second))
+        return NULL;
+    p_accessed -> minute = minute_value;
+    p_accessed -> weekday = recalculate_weekday(p);
+    p_accessed -> nth_day_of_the_year = calculate_nth_day_of_the_year(p);
     return p;
 }
 
 extern date *set_second(date *p, int second_value)
 {
-    struct struct_date *date_p_accessed = access_date(p);
-    date_p_accessed-> second = second_value;
-    date_p_accessed -> weekday = recalculate_weekday(p);
-    date_p_accessed -> nth_day_of_the_year = calculate_nth_day_of_the_year(p);
+    struct struct_date *p_accessed = access_date(p);
+    if (!check_date(p_accessed -> day, p_accessed -> month, p_accessed -> year, p_accessed -> hour, p_accessed -> minute, second_value))
+        return NULL;
+    p_accessed-> second = second_value;
+    p_accessed -> weekday = recalculate_weekday(p);
+    p_accessed -> nth_day_of_the_year = calculate_nth_day_of_the_year(p);
     return p;
 }
 
@@ -597,7 +628,7 @@ extern time_t convert_date_to_gmt_time(const date *p)
     ret += p_accessed -> second;
     ret += p_accessed -> day * SECONDS_IN_A_DAY;
     int years = p_accessed -> year;
-   month_days[1] = isleap(years) ? 29 : 28;
+    month_days[1] = isleap(years) ? 29 : 28;
     for (;years - 1900;){
         if (isleap(--years))
             ret += SECONDS_IN_A_LEAP_YEAR;
@@ -710,11 +741,11 @@ static long date_year_difference(const date *p1, const date *p2)
 
 static long date_hour_difference(const date *p1, const date *p2)
 {
-   time_t date1_converted = convert_date_to_gmt_time(p1);
-   time_t date2_converted = convert_date_to_gmt_time(p2);
+    time_t date1_converted = convert_date_to_gmt_time(p1);
+    time_t date2_converted = convert_date_to_gmt_time(p2);
     if (date1_converted == CONV_FAILURE || date2_converted == CONV_FAILURE)
         return DIFF_FAILURE;
-   return (int)((date1_converted - date2_converted) / (SECONDS_IN_AN_HOUR));
+    return (int)((date1_converted - date2_converted) / (SECONDS_IN_AN_HOUR));
 }
 
 static long date_minute_difference(const date *p1, const date *p2)
@@ -735,7 +766,7 @@ static long date_second_difference(const date *p1, const date *p2)
     return (int)((date1_converted - date2_converted));
 }
 
-extern long date_difference(const date *p1, const date *p2, DIFF_OF_MEMBER member)
+extern long date_difference(const date *p1, const date *p2, DATE_ASSOCIATED_VALUE member)
 {
     switch (member) {
         case DAY : return date_day_difference(p1, p2);
@@ -829,16 +860,4 @@ int scan_date(date *dest)
     return 0;
 
 }
-
-
-
-
-
-
-
-
-
-
-
-
 
