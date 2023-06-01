@@ -104,9 +104,9 @@ extern void free_date(date *dynamic_date_p)
     free(dynamic_date_p);
 }
 
-extern void deactivate_date(date *date_p)
+extern void deactivate_date(date *p)
 {
-    free(date_p -> address);
+    free(p -> address);
 }
 
 
@@ -118,22 +118,22 @@ extern void deactivate_date(date *date_p)
 
 //setter functions
 
-static void normalize_date(date *date_p)
+static void normalize_date(date *p)
 {
-    set_date_from_time_t(date_p, convert_date_to_gmt_time(date_p));
+    set_date_from_time_t(p, convert_date_to_gmt_time(p));
 }
 
-static int calculate_nth_day_of_the_year(const date *date_p)
+static int calculate_nth_day_of_the_year(const date *p)
 {
     int nth_day_of_the_year = 0;
-    const struct struct_date *date_p_accessed = const_access_date(date_p);
-    if (isleap(date_p_accessed -> year))
+    const struct struct_date *p_accessed = const_access_date(p);
+    if (isleap(p_accessed -> year))
         month_days[1] = 29;
     else
         month_days[1] = 28;
-    for (int i = 0;i < date_p_accessed -> month;i++)
+    for (int i = 0; i < p_accessed -> month; i++)
         nth_day_of_the_year += month_days[i];
-    nth_day_of_the_year += date_p_accessed -> day + 1;
+    nth_day_of_the_year += p_accessed -> day + 1;
     return nth_day_of_the_year;
 }
 
@@ -142,12 +142,29 @@ static int calculate_weekday(time_t unsigned_seconds, WEEKDAY_OFFSET offset)
     return (int)((unsigned_seconds + offset * SECONDS_IN_A_DAY) % (7 * SECONDS_IN_A_DAY)) / (SECONDS_IN_A_DAY);
 }
 
-static int recalculate_weekday(date *date_p)
+static int recalculate_weekday(date *p)
 {
-    return calculate_weekday(convert_date_to_gmt_time(date_p) - STARTING_TIME_POINT + access_date(date_p) -> utc_offset * 60 * 60, MONDAY);
+    return calculate_weekday(convert_date_to_gmt_time(p) - STARTING_TIME_POINT + access_date(p) -> utc_offset * 60 * 60, MONDAY);
 }
 
-extern date *set_date(date *date_p, int day_value, int month_value, int year_value, int hour_value, int minute_value, int second_value, int utc)
+static int check_date(int day_value, int month_value, int year_value, int hour_value, int minute_value, int second_value)
+{
+    if (month_value < 0 || month_value > 11)
+        return 0;
+    if (day_value < 0 || day_value > month_days[month_value] - 1)
+        return 0;
+    if (year_value < 1902 || year_value > 2037)
+        return 0;
+    if (hour_value > 59 || hour_value < 0)
+        return 0;
+    if (minute_value < 0 || minute_value > 59)
+        return 0;
+    if (second_value < 0 || second_value > 59)
+        return 0;
+    return 1;
+}
+
+extern date *set_date(date *p, int day_value, int month_value, int year_value, int hour_value, int minute_value, int second_value, int utc)
 {
     if (year_value > 2037 || year_value < 1902)
         return NULL;
@@ -168,29 +185,29 @@ extern date *set_date(date *date_p, int day_value, int month_value, int year_val
     if (second_value > 59 || second_value < 0)
         return NULL;
 
-    struct struct_date *date_p_accessed = access_date(date_p);
-    date_p_accessed -> day = day_value - 1;
-    date_p_accessed -> month = month_value - 1;
-    date_p_accessed -> year = year_value;
-    date_p_accessed -> hour = hour_value;
-    date_p_accessed -> minute = minute_value;
-    date_p_accessed -> second = second_value;
-    date_p_accessed -> weekday = calculate_weekday(convert_date_to_gmt_time(date_p) - STARTING_TIME_POINT, MONDAY);
-    date_p_accessed -> utc_offset = utc;
-    return date_p;
+    struct struct_date *p_accessed = access_date(p);
+    p_accessed -> day = day_value - 1;
+    p_accessed -> month = month_value - 1;
+    p_accessed -> year = year_value;
+    p_accessed -> hour = hour_value;
+    p_accessed -> minute = minute_value;
+    p_accessed -> second = second_value;
+    p_accessed -> weekday = calculate_weekday(convert_date_to_gmt_time(p) - STARTING_TIME_POINT, MONDAY);
+    p_accessed -> utc_offset = utc;
+    return p;
 }
 
-extern date *set_date_from_time_t(date *date_p, time_t seconds_far_from_epoch)
+extern date *set_date_from_time_t(date *p, time_t seconds_far_from_epoch)
 {
     if (seconds_far_from_epoch > ENDING_TIME_POINT || seconds_far_from_epoch < STARTING_TIME_POINT)
         return NULL;
 
-    struct struct_date *date_p_accessed = access_date(date_p);
-    seconds_far_from_epoch += -STARTING_TIME_POINT + date_p_accessed -> utc_offset * 60 * 60;
-    date_p_accessed -> weekday = calculate_weekday(seconds_far_from_epoch, MONDAY);
-    date_p_accessed -> hour = (int)(seconds_far_from_epoch % SECONDS_IN_A_DAY / SECONDS_IN_AN_HOUR);
-    date_p_accessed -> minute = (int)(seconds_far_from_epoch % SECONDS_IN_AN_HOUR / SECONDS_IN_A_MINUTE);
-    date_p_accessed -> second = (int)(seconds_far_from_epoch % SECONDS_IN_A_MINUTE);
+    struct struct_date *p_accessed = access_date(p);
+    seconds_far_from_epoch += -STARTING_TIME_POINT + p_accessed -> utc_offset * 60 * 60;
+    p_accessed -> weekday = calculate_weekday(seconds_far_from_epoch, MONDAY);
+    p_accessed -> hour = (int)(seconds_far_from_epoch % SECONDS_IN_A_DAY / SECONDS_IN_AN_HOUR);
+    p_accessed -> minute = (int)(seconds_far_from_epoch % SECONDS_IN_AN_HOUR / SECONDS_IN_A_MINUTE);
+    p_accessed -> second = (int)(seconds_far_from_epoch % SECONDS_IN_A_MINUTE);
 
     int years = 1900;
     int minus;
@@ -201,25 +218,25 @@ extern date *set_date_from_time_t(date *date_p, time_t seconds_far_from_epoch)
     int i = 0;
     for (; seconds_far_from_epoch - month_days[i] * SECONDS_IN_A_DAY > 0;i++)
         seconds_far_from_epoch -= month_days[i] * SECONDS_IN_A_DAY;
-    date_p_accessed -> year = years;
-    date_p_accessed -> month = i;
-    date_p_accessed -> day = (int)(seconds_far_from_epoch / SECONDS_IN_A_DAY);
-    date_p_accessed -> nth_day_of_the_year = calculate_nth_day_of_the_year(date_p);
+    p_accessed -> year = years;
+    p_accessed -> month = i;
+    p_accessed -> day = (int)(seconds_far_from_epoch / SECONDS_IN_A_DAY);
+    p_accessed -> nth_day_of_the_year = calculate_nth_day_of_the_year(p);
 
-    return date_p;
+    return p;
 }
 
-extern date *set_date_today(date *date_p)
+extern date *set_date_today(date *p)
 {
-    return set_date_from_time_t(date_p, time(NULL));
+    return set_date_from_time_t(p, time(NULL));
 }
 
-extern date *set_date_random(date *date_p)
+extern date *set_date_random(date *p)
 {
     int a;
     FILE *f = fopen("/dev/urandom", "r");
     fread(&a, sizeof(a), 1, f);
-    return set_date_from_time_t(date_p, a);
+    return set_date_from_time_t(p, a);
 }
 
 static int member_assigner(int *member, const char *str)
@@ -244,60 +261,46 @@ static int weekday_and_month_assigner(int *weekday_or_month_member, const char *
     return 1;
 }
 
-extern date *set_date_from_str(date *date_p, const char *str)
+extern date *set_date_from_str(date *p, const char *str)
 {
     char str_copy[DATE_STR_SIZE] = {0};
     memcpy(str_copy, str, strlen(str) + 1);
-    struct struct_date *date_p_accessed = access_date(date_p);
+    struct struct_date *p_accessed = access_date(p);
 
 
     char *end = strtok(str_copy, " ");
-    if(weekday_and_month_assigner(&date_p_accessed -> weekday, end, weekday_names, asize(weekday_names)))
+    if(weekday_and_month_assigner(&p_accessed -> weekday, end, weekday_names, asize(weekday_names)))
         return NULL;
 
     end = strtok(NULL, " ");
-    if(weekday_and_month_assigner(&date_p_accessed -> month, end, month_names, asize(month_names)))
+    if(weekday_and_month_assigner(&p_accessed -> month, end, month_names, asize(month_names)))
         return NULL;
 
     end = strtok(NULL, " ");
-    if (!end || member_assigner(&date_p_accessed -> day, end))
+    if (!end || member_assigner(&p_accessed -> day, end))
         return NULL;
 
     end = strtok(NULL, " ");
-    if (!end || member_assigner(&date_p_accessed -> hour, end))
+    if (!end || member_assigner(&p_accessed -> hour, end))
         return NULL;
 
     end = (strtok(end, ":"), strtok(NULL, ":"));
-    if (!end || member_assigner(&date_p_accessed -> minute, end))
+    if (!end || member_assigner(&p_accessed -> minute, end))
         return NULL;
 
     end = strtok(NULL, ":");
-    if (!end || member_assigner(&date_p_accessed -> second, end))
+    if (!end || member_assigner(&p_accessed -> second, end))
         return NULL;
 
     end = strtok(end + strlen(end) + 1, " ");
-    if (!end || member_assigner(&date_p_accessed -> year, end))
+    if (!end || member_assigner(&p_accessed -> year, end))
+        return NULL;
+
+    if (!check_date(p_accessed -> day, p_accessed -> month, p_accessed -> year, p_accessed -> hour, p_accessed -> minute, p_accessed -> second))
         return NULL;
 
 
-    return date_p;
-}
-
-static int check_date(int day_value, int month_value, int year_value, int hour_value, int minute_value, int second_value)
-{
-    if (month_value < 0 || month_value > 11)
-        return 0;
-    if (day_value < 0 || day_value > month_days[month_value] - 1)
-        return 0;
-    if (year_value < 1902 || year_value > 2037)
-        return 0;
-    if (hour_value > 59 || hour_value < 0)
-        return 0;
-    if (minute_value < 0 || minute_value > 59)
-        return 0;
-    if (second_value < 0 || second_value > 59)
-        return 0;
-    return 1;
+    return p;
 }
 
 extern date *set_year(date *p, int year_value)
@@ -325,6 +328,10 @@ extern date *set_month(date *p, int month_value)
 extern date *set_day(date *p, int day_value)
 {
     struct struct_date *p_accessed = access_date(p);
+    if (isleap(p_accessed -> year))
+        month_days[1] = 29;
+    else
+        month_days[1] = 28;
     if (!check_date(day_value - 1, p_accessed -> month, p_accessed -> year, p_accessed -> hour, p_accessed -> minute, p_accessed -> second))
         return NULL;
     p_accessed -> day = day_value - 1;
@@ -860,4 +867,6 @@ int scan_date(date *dest)
     return 0;
 
 }
+
+
 
