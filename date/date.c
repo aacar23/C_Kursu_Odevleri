@@ -19,8 +19,8 @@ static const char * const weekday_names[7] = {"Monday", "Tuesday", "Wednesday", 
 #define ASSIGN (1)
 #define DONT_ASSIGN (0)
 
-#define localize_and_access(dest, source) (const_access_date(time_t_to_date_gmt(dest, date_to_time_t_local(NULL, source))))
-#define localize(dest, source) ((time_t_to_date_gmt(dest, date_to_time_t_local(NULL, source))))
+#define localize_and_access(dest, source) (const_access_date(time_t_to_date_gmt((dest), date_to_time_t_local(NULL, (source)))))
+#define localize(dest, source) ((time_t_to_date_gmt((dest), date_to_time_t_local(NULL, (source)))))
 
 #define implement_difference_func(unit, func_identifier) time_t difference = (func_identifier)(p1, p2); \
                                                         return  difference == DIFF_FAILURE ? DIFF_FAILURE : difference / (unit); \
