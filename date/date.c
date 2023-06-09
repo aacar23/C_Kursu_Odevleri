@@ -485,8 +485,7 @@ static time_t date_difference_months_gmt(const date *p1, const date *p2)
 
 static time_t date_difference_years_gmt(date *p1, date *p2)
 {
-    time_t difference = date_difference_months_gmt(p1, p2);
-    return difference == DIFF_FAILURE ? DIFF_FAILURE :  difference / 12;
+    implement_difference_func(12, date_difference_months_gmt)
 }
 
 extern time_t date_difference_gmt(date *p1, date *p2, DATE_VALUE unit)
@@ -548,8 +547,7 @@ static time_t date_difference_months_local(const date *p1, const date *p2)
 
 static time_t date_difference_years_local(const date *p1, const date *p2)
 {
-    time_t timer = date_difference_months_local(p1, p2);
-    return timer == DIFF_FAILURE ? DIFF_FAILURE : timer / 12;
+    implement_difference_func(12, date_difference_months_local)
 }
 
 extern time_t date_difference_local(date *p1, date *p2, DATE_VALUE unit)
