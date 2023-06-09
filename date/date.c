@@ -597,7 +597,7 @@ extern date *n_minutes_before_date(date *dest, const date *source, int n)
 
 extern date *n_minutes_after_date(date *dest, const date *source, int n)
 {
-    return n_time_before_date(dest, source,- n * SECONDS_IN_A_MINUTE, &n_minutes_after_obj);
+    return n_time_before_date(dest, source, -n * SECONDS_IN_A_MINUTE, &n_minutes_after_obj);
 }
 
 extern date *n_hours_before_date(date *dest, const date *source, int n)
