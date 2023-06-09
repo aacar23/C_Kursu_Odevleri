@@ -147,8 +147,10 @@ static int calculate_nth_day_of_the_year_gmt(date *p, int assign)
 
 static int calculate_nth_day_of_the_year_local(date *p)
 {
-
-    time_t timer = calculate_nth_day_of_the_year_gmt(p, DONT_ASSIGN) * SECONDS_IN_A_DAY + get_utc(p) * SECONDS_IN_AN_HOUR +
+    int calc_nth_day_gmt = calculate_nth_day_of_the_year_gmt(p, DONT_ASSIGN);
+    if (calc_nth_day_gmt == NTH_DAY_CALC_FAILURE)
+        return NTH_DAY_CALC_FAILURE;
+    time_t timer = calc_nth_day_gmt * SECONDS_IN_A_DAY + get_utc(p) * SECONDS_IN_AN_HOUR +
             get_gmt_hour(p) * SECONDS_IN_AN_HOUR;
     return access_date(p) -> local_nth_day_of_the_year = (int)(timer / SECONDS_IN_A_DAY);
 }
