@@ -534,8 +534,8 @@ static time_t date_difference_months_local(const date *p1, const date *p2)
         return DIFF_FAILURE;
     if (!check_date_by_ptr(p2))
         return DIFF_FAILURE;
-    date_core p1_localized;
-    date_core p2_localized;
+    static date_core p1_localized;
+    static date_core p2_localized;
     date p1_local = {.address = &p1_localized};
     date p2_local = {.address = &p2_localized};
 
