@@ -20,7 +20,7 @@
 #define SECONDS_IN_AN_HOUR (60 * 60)
 #define SECONDS_IN_A_MINUTE (60)
 
-#define DATE_STR_SIZE (36)
+#define DATE_STR_SIZE (37)
 
 typedef struct{
     void *address;
