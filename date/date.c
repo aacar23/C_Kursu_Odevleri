@@ -173,6 +173,7 @@ static int calculate_weekday(date *p, int assign)
 extern void activate_date(date *p, int utc_val)
 {
     p -> address = malloc(sizeof(date_core));
+    memset(p -> address, 0, sizeof(date_core));
     access_date(p) -> utc = utc_val;
 }
 
