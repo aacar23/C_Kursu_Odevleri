@@ -126,7 +126,7 @@ static void *checked_malloc(size_t size)
 {
     void *vp;
     if (!(vp = (malloc)(size))){
-        fprintf(stderr, "heap is full");
+        fprintf(stderr, "not enough memory");
         exit(EXIT_FAILURE);
     }
     return vp;
