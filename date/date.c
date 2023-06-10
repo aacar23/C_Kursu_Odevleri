@@ -742,6 +742,8 @@ extern date *str_to_date_gmt(date *dest, const char *source)
     if (assign_value(&dest_accessed -> gmt_day, end))
         return NULL;
     end = strtok(end + strlen(end) + 1, ":");
+    if (!end)
+        return NULL;
     if (assign_value(&dest_accessed -> gmt_hour, end))
         return NULL;
     prev = end;
