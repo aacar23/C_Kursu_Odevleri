@@ -709,6 +709,8 @@ extern date *str_to_date_gmt(date *dest, const char *source)
     memcpy(source_copy, source, source_size);
     char *prev = source_copy;
     char *end = strtok(source_copy, " ");
+    if (!end)
+         return NULL;
     for (int i = 0;i < 7;i++) {
         if (!memcmp(end, weekday_names[i], 3)) {
             dest_accessed -> gmt_weekday = i;
@@ -719,8 +721,9 @@ extern date *str_to_date_gmt(date *dest, const char *source)
     return NULL;
 
     outside:
+    prev = end;
     end = strtok(NULL, " ");
-    if (end == prev)
+    if (end == prev || !end)
         return NULL;
     for (int i = 0;i < 12;i++) {
         if (!memcmp(end, month_names[i], 3)) {
@@ -734,7 +737,7 @@ extern date *str_to_date_gmt(date *dest, const char *source)
     out:
     prev = end;
     end = strtok(NULL, " ");
-    if (end == prev)
+    if (end == prev || !end)
         return NULL;
     if (assign_value(&dest_accessed -> gmt_day, end))
         return NULL;
@@ -743,19 +746,19 @@ extern date *str_to_date_gmt(date *dest, const char *source)
         return NULL;
     prev = end;
     end = strtok(NULL, ":");
-    if (end == prev)
+    if (end == prev || !end)
         return NULL;
     if (assign_value(&dest_accessed -> gmt_minute, end))
         return NULL;
     prev = end;
     end = strtok(NULL, ":");
-    if (end == prev)
+    if (end == prev || !end)
         return NULL;
     if (assign_value(&dest_accessed -> gmt_second, end))
         return NULL;
     prev = end;
     end = (strtok(end, " "), strtok(NULL, " "));
-    if (end == prev)
+    if (end == prev || !end)
         return NULL;
     if (assign_value(&dest_accessed -> gmt_year, end))
         return NULL;
