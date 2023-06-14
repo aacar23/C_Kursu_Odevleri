@@ -6,8 +6,8 @@
 
 
 static int month_days[12] = {31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31};
-static const char *month_names[12] = {"January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"};
-static const char *weekday_names[7] = {"Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"};
+static const char * const month_names[12] = {"January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"};
+static const char * const weekday_names[7] = {"Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"};
 
 #define malloc(size) (checked_malloc(size))
 #define access_date(p) ((date_core *)((p) -> address))
@@ -19,8 +19,8 @@ static const char *weekday_names[7] = {"Monday", "Tuesday", "Wednesday", "Thursd
 #define ASSIGN (1)
 #define DONT_ASSIGN (0)
 
-#define localize_and_access(dest, source) (const_access_date(time_t_to_date_gmt(dest, date_to_time_t_local(NULL, source))))
-#define localize(dest, source) ((time_t_to_date_gmt(dest, date_to_time_t_local(NULL, source))))
+#define localize_and_access(dest, source) (const_access_date(time_t_to_date_gmt((dest), date_to_time_t_local(NULL, (source)))))
+#define localize(dest, source) ((time_t_to_date_gmt((dest), date_to_time_t_local(NULL, (source)))))
 
 #define implement_difference_func(unit, func_identifier) time_t difference = (func_identifier)(p1, p2); \
                                                         return  difference == DIFF_FAILURE ? DIFF_FAILURE : difference / (unit); \
@@ -126,7 +126,7 @@ static void *checked_malloc(size_t size)
 {
     void *vp;
     if (!(vp = (malloc)(size))){
-        fprintf(stderr, "heap is full");
+        fprintf(stderr, "not enough memory");
         exit(EXIT_FAILURE);
     }
     return vp;
@@ -147,8 +147,10 @@ static int calculate_nth_day_of_the_year_gmt(date *p, int assign)
 
 static int calculate_nth_day_of_the_year_local(date *p)
 {
-
-    time_t timer = calculate_nth_day_of_the_year_gmt(p, DONT_ASSIGN) * SECONDS_IN_A_DAY + get_utc(p) * SECONDS_IN_AN_HOUR +
+    int calc_nth_day_gmt = calculate_nth_day_of_the_year_gmt(p, DONT_ASSIGN);
+    if (calc_nth_day_gmt == NTH_DAY_CALC_FAILURE)
+        return NTH_DAY_CALC_FAILURE;
+    time_t timer = calc_nth_day_gmt * SECONDS_IN_A_DAY + get_utc(p) * SECONDS_IN_AN_HOUR +
             get_gmt_hour(p) * SECONDS_IN_AN_HOUR;
     return access_date(p) -> local_nth_day_of_the_year = (int)(timer / SECONDS_IN_A_DAY);
 }
@@ -171,6 +173,7 @@ static int calculate_weekday(date *p, int assign)
 extern void activate_date(date *p, int utc_val)
 {
     p -> address = malloc(sizeof(date_core));
+    memset(p -> address, 0, sizeof(date_core));
     access_date(p) -> utc = utc_val;
 }
 
@@ -483,8 +486,7 @@ static time_t date_difference_months_gmt(const date *p1, const date *p2)
 
 static time_t date_difference_years_gmt(date *p1, date *p2)
 {
-    time_t difference = date_difference_months_gmt(p1, p2);
-    return difference == DIFF_FAILURE ? DIFF_FAILURE :  difference / 12;
+    implement_difference_func(12, date_difference_months_gmt)
 }
 
 extern time_t date_difference_gmt(date *p1, date *p2, DATE_VALUE unit)
@@ -533,8 +535,8 @@ static time_t date_difference_months_local(const date *p1, const date *p2)
         return DIFF_FAILURE;
     if (!check_date_by_ptr(p2))
         return DIFF_FAILURE;
-    date_core p1_localized;
-    date_core p2_localized;
+    static date_core p1_localized;
+    static date_core p2_localized;
     date p1_local = {.address = &p1_localized};
     date p2_local = {.address = &p2_localized};
 
@@ -546,8 +548,7 @@ static time_t date_difference_months_local(const date *p1, const date *p2)
 
 static time_t date_difference_years_local(const date *p1, const date *p2)
 {
-    time_t timer = date_difference_months_local(p1, p2);
-    return timer == DIFF_FAILURE ? DIFF_FAILURE : timer / 12;
+    implement_difference_func(12, date_difference_months_local)
 }
 
 extern time_t date_difference_local(date *p1, date *p2, DATE_VALUE unit)
@@ -597,7 +598,7 @@ extern date *n_minutes_before_date(date *dest, const date *source, int n)
 
 extern date *n_minutes_after_date(date *dest, const date *source, int n)
 {
-    return n_time_before_date(dest, source,- n * SECONDS_IN_A_MINUTE, &n_minutes_after_obj);
+    return n_time_before_date(dest, source, -n * SECONDS_IN_A_MINUTE, &n_minutes_after_obj);
 }
 
 extern date *n_hours_before_date(date *dest, const date *source, int n)
@@ -708,6 +709,8 @@ extern date *str_to_date_gmt(date *dest, const char *source)
     memcpy(source_copy, source, source_size);
     char *prev = source_copy;
     char *end = strtok(source_copy, " ");
+    if (!end)
+         return NULL;
     for (int i = 0;i < 7;i++) {
         if (!memcmp(end, weekday_names[i], 3)) {
             dest_accessed -> gmt_weekday = i;
@@ -718,8 +721,9 @@ extern date *str_to_date_gmt(date *dest, const char *source)
     return NULL;
 
     outside:
+    prev = end;
     end = strtok(NULL, " ");
-    if (end == prev)
+    if (end == prev || !end)
         return NULL;
     for (int i = 0;i < 12;i++) {
         if (!memcmp(end, month_names[i], 3)) {
@@ -733,28 +737,30 @@ extern date *str_to_date_gmt(date *dest, const char *source)
     out:
     prev = end;
     end = strtok(NULL, " ");
-    if (end == prev)
+    if (end == prev || !end)
         return NULL;
     if (assign_value(&dest_accessed -> gmt_day, end))
         return NULL;
     end = strtok(end + strlen(end) + 1, ":");
+    if (!end)
+        return NULL;
     if (assign_value(&dest_accessed -> gmt_hour, end))
         return NULL;
     prev = end;
     end = strtok(NULL, ":");
-    if (end == prev)
+    if (end == prev || !end)
         return NULL;
     if (assign_value(&dest_accessed -> gmt_minute, end))
         return NULL;
     prev = end;
     end = strtok(NULL, ":");
-    if (end == prev)
+    if (end == prev || !end)
         return NULL;
     if (assign_value(&dest_accessed -> gmt_second, end))
         return NULL;
     prev = end;
     end = (strtok(end, " "), strtok(NULL, " "));
-    if (end == prev)
+    if (end == prev || !end)
         return NULL;
     if (assign_value(&dest_accessed -> gmt_year, end))
         return NULL;

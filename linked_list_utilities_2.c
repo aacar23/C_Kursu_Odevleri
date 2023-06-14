@@ -1,4 +1,4 @@
-#include <s#include <stdlib.h>
+#include <stdlib.h>
 #include <stdio.h>
 
 struct linked_element{
