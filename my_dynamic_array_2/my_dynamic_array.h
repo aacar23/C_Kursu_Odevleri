@@ -1,4 +1,4 @@
-#if !defined MY_DYNAMIC_ARRAY_H || defined MEMBERS
+#if !defined MY_DYNAMIC_ARRAY_H && defined MEMBERS
 #define MY_DYNAMIC_ARRAY_H
 
 struct elem MEMBERS;
