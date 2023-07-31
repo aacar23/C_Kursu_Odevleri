@@ -22,14 +22,19 @@ void bprint(int val)
 	char str[33] = { 0 };
 	memset(str, 48, 32);
 
-	int print_ind = 0;
+	
 	for (int i = 0;val; val /= 2, ++i)
 		*(str + i) += val % 2;
 
 	reverse_str(str);
-
+	
+	int print_ind = 0;
 	while (!(*(str + print_ind) - 48))
 		++print_ind;
-
+	
+	if (!*(str + print_ind)) {
+		putchar('\x30');
+		return;
+	}
 	puts(str + print_ind);
 }
