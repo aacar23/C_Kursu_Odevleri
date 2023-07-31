@@ -1,20 +1,35 @@
 #include "bprint.h"
 
 #include <stdio.h>
-#include <inttypes.h>
+#include <string.h>
 
-void bprint(int32_t low, int32_t high)
+void swap(char* a, char* b)
 {
-	union num_64{
-		struct{
-			int32_t low;
-			int32_t high;
-		};
-		int64_t value;
-	}num;
+	int temp = *a;
+	*a = *b;
+	*b = temp;
+}
 
-	num.low = low;
-	num.high = high;
+void reverse_str(const char* str)
+{
+	size_t size = strlen(str);
+	for (size_t i = 0; i < size / 2; ++i)
+		swap(str + i, str + size - i - 1);
+}
 
-	printf("%" PRId64 , num.value);
+void bprint(int val)
+{
+	char str[33] = { 0 };
+	memset(str, 48, 32);
+
+	int print_ind = 0;
+	for (int i = 0;i < 32; val /= 2, ++i)
+		*(str + i) += val % 2;
+
+	reverse_str(str);
+
+	while (!(*(str + print_ind) - 48))
+		++print_ind;
+
+	puts(str + print_ind);
 }
