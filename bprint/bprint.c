@@ -18,11 +18,12 @@ void reverse_str(const char* str)
 
 void bprint(int val)
 {
+	unsigned int uval = (unsigned int)val;
 	static char str[33] = { 0 };
 
 	int print_ind = 0;
-	for (int i = 0;val; val /= 2, ++i)
-		*(str + i) += val % 2 + 48;
+	for (int i = 0;uval; uval /= 2, ++i)
+		*(str + i) += uval % 2 + 48;
 
 	reverse_str(str);
 
