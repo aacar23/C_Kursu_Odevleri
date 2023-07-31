@@ -1,7 +1,6 @@
 #include "bprint.h"
 
 #include <stdio.h>
-#include <string.h>
 
 void swap(char* a, char* b)
 {
