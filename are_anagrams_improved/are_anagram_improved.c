@@ -1,19 +1,19 @@
 #include "are_anagrams_improved.h"
 
-#include <ctype.h>
 #include <stddef.h>
-
-#define NTH_LETTER(letter) ((toupper((letter))) - 48)
 
 int are_anagrams_improved(const char* str1, const char* str2)
 {
 	int flags = 0;
 
-	for (;*str1;++str1)
-		flags ^= (1 << NTH_LETTER(*str1));
+	size_t size_str1 = 0;
+	size_t size_str2 = 0;
 
-	for (;*str2;++str2)
-		flags ^= (1 << NTH_LETTER(*str2));
+	for (;*(str1 + size_str1); ++size_str1)
+		flags ^= (1 << *(str1 + size_str1));
+	for (;*(str2 + size_str2); ++size_str2)
+		flags ^= (1 << *(str2 + size_str2));
+			
 
-	return !flags;
+	return size_str1 == size_str2 && !flags;
 }
