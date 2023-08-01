@@ -1,11 +1,11 @@
-#include "is_anagram_improved.h"
+#include "are_anagrams_improved.h"
 
 #include <ctype.h>
 #include <stddef.h>
 
 #define NTH_LETTER(letter) ((toupper((letter))) - 48)
 
-int is_anagram_improved(const char* str1, const char* str2)
+int are_anagrams_improved(const char* str1, const char* str2)
 {
 	int flags = 0;
 
