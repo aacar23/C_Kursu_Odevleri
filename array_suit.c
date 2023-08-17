@@ -98,11 +98,9 @@ void *necmemmove(void *vpdest, const void *vpsource, size_t bytes)
             ;
         return vpdest;
     }
-    else{
-        while (*pdest++ = *psource++, --bytes)
-            ;
-        return vpdest;
-    }
+    while (*pdest++ = *psource++, --bytes)
+        ;
+    return vpdest;
 }
 
 void *mymemmove(void *vpdest, const void *vpsource, size_t bytes)
